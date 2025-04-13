@@ -1,5 +1,5 @@
 # Build stage
-FROM node:18-alpine as builder
+FROM node:18-alpine AS build
 
 WORKDIR /app
 
@@ -26,10 +26,10 @@ COPY package*.json ./
 # Install production dependencies only
 RUN npm install --production
 
-# Copy built files from builder stage
-COPY --from=builder /app/.next ./.next
-COPY --from=builder /app/public ./public
-COPY --from=builder /app/package.json ./package.json
+# Copy built files from build stage
+COPY --from=build /app/.next ./.next
+COPY --from=build /app/public ./public
+COPY --from=build /app/package.json ./package.json
 
 # Expose port
 EXPOSE 3000

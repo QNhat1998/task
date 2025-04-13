@@ -20,6 +20,8 @@ export const useAuth = () => {
   const router = useRouter();
 
   const login = async (data: LoginFormData) => {
+    console.log(data);
+
     try {
       setIsLoading(true);
       const response = await fetch("http://localhost:4000/auth/login", {
@@ -38,7 +40,7 @@ export const useAuth = () => {
       // Lưu token vào Cookies với thời hạn 7 ngày
       Cookies.set("token", accessToken, { expires: 7 });
       console.log(accessToken);
-      
+
       localStorage.setItem("token", accessToken);
       // Lưu userId vào localStorage
       localStorage.setItem("userId", user.id.toString());

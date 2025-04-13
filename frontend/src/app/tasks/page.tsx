@@ -61,10 +61,32 @@ export default function TasksPage() {
   useEffect(() => {
     setIsMounted(true);
     const token = Cookies.get("token");
-    if (!token) {
+    const user = localStorage.getItem("userId");
+
+    console.log("Token:", token);
+    console.log("User data:", user);
+
+    if (!token || !user) {
+      console.log("No token or user data found, redirecting to login");
       router.push("/login");
       return;
     }
+
+    try {
+      const userData = JSON.parse(user);
+      console.log("Parsed user data:", userData);
+
+      if (!userData) {
+        console.log("No user ID found in user data");
+        router.push("/login");
+        return;
+      }
+    } catch (err) {
+      console.error("Error parsing user data:", err);
+      router.push("/login");
+      return;
+    }
+
     fetchTasks();
   }, [router]);
 

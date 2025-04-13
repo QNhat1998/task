@@ -33,6 +33,7 @@ export const useTasks = () => {
         headers: {
           Authorization: `Bearer ${token}`,
         },
+        credentials: "include",
       });
 
       console.log("Response status:", response.status);
@@ -73,6 +74,7 @@ export const useTasks = () => {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(taskData),
+        credentials: "include",
       });
 
       if (!response.ok) {
@@ -108,6 +110,7 @@ export const useTasks = () => {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(taskData),
+        credentials: "include",
       });
 
       if (!response.ok) {
@@ -140,6 +143,7 @@ export const useTasks = () => {
         headers: {
           Authorization: `Bearer ${token}`,
         },
+        credentials: "include",
       });
 
       if (!response.ok) {

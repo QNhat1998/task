@@ -13,7 +13,7 @@ interface TaskListProps {
   categories: Category[];
 }
 
-export const TaskList = ({ tasks, onDelete, onUpdate, categories }: TaskListProps) => {
+export const TaskList = ({ tasks = [], onDelete, onUpdate, categories }: TaskListProps) => {
   const [editingTaskId, setEditingTaskId] = useState<number | null>(null);
 
   const handleUpdateTask = async (id: number, data: CreateTask) => {
@@ -25,7 +25,7 @@ export const TaskList = ({ tasks, onDelete, onUpdate, categories }: TaskListProp
     await onDelete(id);
   };
 
-  if (tasks.length === 0) {
+  if (!Array.isArray(tasks) || tasks.length === 0) {
     return (
       <div className="text-center py-8">
         <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">

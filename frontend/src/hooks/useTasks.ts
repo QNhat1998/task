@@ -1,15 +1,31 @@
 import { useState, useEffect } from "react";
 import { Task, CreateTask } from "@/types/task";
 
+const API_URL = "http://188.166.225.136:3000";
+
 export const useTasks = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Lấy user_id từ token hoặc localStorage
+  const getUserId = () => {
+    const user = localStorage.getItem("user");
+    if (user) {
+      const userData = JSON.parse(user);
+      return userData.id;
+    }
+    return null;
+  };
+
   const fetchTasks = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch("http://localhost:4000/tasks", {
+      const userId = getUserId();
+      if (!userId) {
+        throw new Error("User not logged in");
+      }
+      const response = await fetch(`${API_URL}/users/${userId}/tasks`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
@@ -25,7 +41,11 @@ export const useTasks = () => {
 
   const createTask = async (taskData: CreateTask) => {
     try {
-      const response = await fetch("http://localhost:4000/tasks", {
+      const userId = getUserId();
+      if (!userId) {
+        throw new Error("User not logged in");
+      }
+      const response = await fetch(`${API_URL}/users/${userId}/tasks`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -42,8 +62,12 @@ export const useTasks = () => {
 
   const updateTask = async (id: number, taskData: Partial<Task>) => {
     try {
-      const response = await fetch(`http://localhost:4000/tasks/${id}`, {
-        method: "PUT",
+      const userId = getUserId();
+      if (!userId) {
+        throw new Error("User not logged in");
+      }
+      const response = await fetch(`${API_URL}/users/${userId}/tasks/${id}`, {
+        method: "PATCH",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -59,7 +83,11 @@ export const useTasks = () => {
 
   const deleteTask = async (id: number) => {
     try {
-      await fetch(`http://localhost:4000/tasks/${id}`, {
+      const userId = getUserId();
+      if (!userId) {
+        throw new Error("User not logged in");
+      }
+      await fetch(`${API_URL}/users/${userId}/tasks/${id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,

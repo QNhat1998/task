@@ -12,7 +12,7 @@ RUN npm install
 # Copy source code
 COPY . .
 
-# Build TypeScript
+# Build NestJS
 RUN npm run build
 
 # Kiểm tra cấu trúc thư mục sau khi build
@@ -45,4 +45,4 @@ ENV NODE_ENV=production
 ENV PORT=4000
 
 # Start the application
-CMD ["node", "dist/index.js"] 
+CMD ["node", "dist/main.js"] 

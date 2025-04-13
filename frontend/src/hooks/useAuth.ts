@@ -3,6 +3,9 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Cookies from "js-cookie";
+import { User } from "@/types/task";
+
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
 interface LoginFormData {
   email: string;
@@ -17,36 +20,47 @@ interface RegisterFormData {
 
 export const useAuth = () => {
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
   const login = async (data: LoginFormData) => {
-    console.log(data);
-
     try {
       setIsLoading(true);
-      const response = await fetch("http://localhost:4000/auth/login", {
+      setError(null);
+
+      const response = await fetch(`${API_URL}/auth/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(data),
+        credentials: "include",
       });
 
       if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error("Email hoặc mật khẩu không đúng");
+        }
         throw new Error("Đăng nhập thất bại");
       }
 
       const { accessToken, user } = await response.json();
-      // Lưu token vào Cookies với thời hạn 7 ngày
-      Cookies.set("token", accessToken, { expires: 7 });
-      console.log(accessToken);
 
-      localStorage.setItem("token", accessToken);
-      // Lưu userId vào localStorage
+      // Lưu token vào Cookies với thời hạn 7 ngày
+      Cookies.set("token", accessToken, {
+        expires: 7,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+      });
+
+      // Lưu user data vào localStorage
+      localStorage.setItem("user", JSON.stringify(user));
       localStorage.setItem("userId", user.id.toString());
+
       router.push("/tasks");
     } catch (error) {
       console.error("Login error:", error);
+      setError(error instanceof Error ? error.message : "Có lỗi xảy ra khi đăng nhập");
       throw error;
     } finally {
       setIsLoading(false);
@@ -56,21 +70,28 @@ export const useAuth = () => {
   const register = async (data: RegisterFormData) => {
     try {
       setIsLoading(true);
-      const response = await fetch("http://localhost:4000/auth/register", {
+      setError(null);
+
+      const response = await fetch(`${API_URL}/auth/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(data),
+        credentials: "include",
       });
 
       if (!response.ok) {
+        if (response.status === 409) {
+          throw new Error("Email đã tồn tại");
+        }
         throw new Error("Đăng ký thất bại");
       }
 
       router.push("/login");
     } catch (error) {
       console.error("Register error:", error);
+      setError(error instanceof Error ? error.message : "Có lỗi xảy ra khi đăng ký");
       throw error;
     } finally {
       setIsLoading(false);
@@ -78,14 +99,34 @@ export const useAuth = () => {
   };
 
   const logout = () => {
-    // Xóa cả token và userId
-    Cookies.remove("token");
-    localStorage.removeItem("userId");
-    router.push("/login");
+    try {
+      // Xóa token từ Cookies
+      Cookies.remove("token", {
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+      });
+
+      // Xóa user data từ localStorage
+      localStorage.removeItem("user");
+      localStorage.removeItem("userId");
+
+      router.push("/login");
+    } catch (error) {
+      console.error("Logout error:", error);
+      setError("Có lỗi xảy ra khi đăng xuất");
+    }
+  };
+
+  // Lấy user data từ localStorage
+  const getUser = (): User | null => {
+    if (typeof window === "undefined") return null;
+    const userStr = localStorage.getItem("user");
+    return userStr ? JSON.parse(userStr) : null;
   };
 
   // Lấy token từ Cookies
   const token = typeof window !== "undefined" ? Cookies.get("token") : null;
+
   // Lấy userId từ localStorage
   const userId = typeof window !== "undefined" ? localStorage.getItem("userId") : null;
 
@@ -94,7 +135,9 @@ export const useAuth = () => {
     register,
     logout,
     isLoading,
+    error,
     token,
     userId: userId ? parseInt(userId) : null,
+    user: getUser(),
   };
 };

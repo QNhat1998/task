@@ -9,7 +9,7 @@ async function bootstrap() {
 
   // Cấu hình CORS
   app.enableCors({
-    origin: ["http://188.166.225.136:3000", "http://localhost:3000"],
+    origin: ["http://localhost:3000", "http://188.166.225.136:3000"],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     allowedHeaders: ["Content-Type", "Authorization"],
@@ -19,12 +19,7 @@ async function bootstrap() {
   app.use(cookieParser());
 
   // Global validation pipe
-  app.useGlobalPipes(
-    new ValidationPipe({
-      whitelist: true,
-      transform: true,
-    })
-  );
+  app.useGlobalPipes(new ValidationPipe());
 
   // Swagger setup
   const config = new DocumentBuilder().setTitle("Task Manager API").setDescription("The Task Manager API description").setVersion("1.0").addBearerAuth().build();

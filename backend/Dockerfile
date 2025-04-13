@@ -12,7 +12,7 @@ RUN npm install
 # Copy source code
 COPY . .
 
-# Build the application
+# Build TypeScript
 RUN npm run build
 
 # Production stage
@@ -29,6 +29,7 @@ RUN npm install --production
 # Copy built files from build stage
 COPY --from=build /app/dist ./dist
 COPY --from=build /app/package.json ./package.json
+COPY --from=build /app/.env ./.env
 
 # Expose port
 EXPOSE 4000

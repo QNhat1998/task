@@ -36,7 +36,7 @@ EXPOSE 3000
 
 # Set environment variables
 ENV NODE_ENV=production
-ENV NEXT_PUBLIC_API_URL=http://localhost:4000
+ENV NEXT_PUBLIC_API_URL=http://188.166.225.136:4000
 
 # Start the application
 CMD ["npm", "start"] 

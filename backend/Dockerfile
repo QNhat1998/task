@@ -1,5 +1,5 @@
 # Build stage
-FROM node:18-alpine AS builder
+FROM node:18-alpine AS build
 
 WORKDIR /app
 
@@ -26,11 +26,16 @@ COPY package*.json ./
 # Install production dependencies only
 RUN npm install --production
 
-# Copy built files from builder stage
-COPY --from=builder /app/dist ./dist
+# Copy built files from build stage
+COPY --from=build /app/dist ./dist
+COPY --from=build /app/package.json ./package.json
 
 # Expose port
 EXPOSE 4000
 
+# Set environment variables
+ENV NODE_ENV=production
+ENV PORT=4000
+
 # Start the application
-CMD ["npm", "start"] 
+CMD ["node", "dist/index.js"] 

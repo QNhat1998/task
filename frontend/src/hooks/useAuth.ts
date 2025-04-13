@@ -49,7 +49,7 @@ export const useAuth = () => {
       // Lưu token vào Cookies với thời hạn 7 ngày
       Cookies.set("token", accessToken, {
         expires: 7,
-        secure: process.env.NODE_ENV === "production",
+        secure: false,
         sameSite: "lax",
       });
 

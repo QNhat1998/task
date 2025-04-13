@@ -9,11 +9,10 @@ async function bootstrap() {
 
   // Cấu hình CORS
   app.enableCors({
-    origin: true, // Cho phép tất cả origin
+    origin: ["http://localhost:3000", "http://188.166.225.136:3000"],
     credentials: true,
-    methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Accept", "Authorization"],
-    exposedHeaders: ["Set-Cookie"],
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   });
 
   // Sử dụng cookie-parser
@@ -28,6 +27,5 @@ async function bootstrap() {
   SwaggerModule.setup("api", app, document);
 
   await app.listen(process.env.PORT || 4000);
-  console.log(`Application is running on: ${await app.getUrl()}`);
 }
 bootstrap();

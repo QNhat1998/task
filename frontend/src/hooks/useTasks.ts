@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Task, CreateTask } from "@/types/task";
 
-const API_URL = "http://188.166.225.136:3000";
+const API_URL = "http://188.166.225.136:4000";
 
 export const useTasks = () => {
   const [tasks, setTasks] = useState<Task[]>([]);

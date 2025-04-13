@@ -15,6 +15,9 @@ COPY . .
 # Build TypeScript
 RUN npm run build
 
+# Kiểm tra cấu trúc thư mục sau khi build
+RUN ls -la /app/dist
+
 # Production stage
 FROM node:18-alpine
 
@@ -30,6 +33,9 @@ RUN npm install --production
 COPY --from=build /app/dist ./dist
 COPY --from=build /app/package.json ./package.json
 COPY --from=build /app/.env ./.env
+
+# Kiểm tra cấu trúc thư mục trong production
+RUN ls -la /app/dist
 
 # Expose port
 EXPOSE 4000

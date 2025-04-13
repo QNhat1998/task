@@ -12,7 +12,7 @@ RUN npm install
 # Copy source code
 COPY . .
 
-# Build the application
+# Build Next.js
 RUN npm run build
 
 # Production stage

@@ -8,6 +8,7 @@ import { TaskForm } from "@/components/tasks/TaskForm";
 import { useTasks } from "@/hooks/useTasks";
 import { Task, Category, CreateTask } from "@/types/task";
 import Cookies from "js-cookie";
+import { useToken } from "@/hooks/useToken";
 
 const categories: Category[] = [
   {
@@ -60,7 +61,10 @@ export default function TasksPage() {
 
   useEffect(() => {
     setIsMounted(true);
-    const token = Cookies.get("token");
+    const { getToken } = useToken();
+    const token = getToken();
+    console.log(token);
+    
     const user = localStorage.getItem("userId");
 
     console.log("Token:", token);
@@ -125,6 +129,10 @@ export default function TasksPage() {
         <div className="text-center">Loading...</div>
       </Layout>
     );
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
   }
 
   return (

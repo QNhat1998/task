@@ -9,10 +9,10 @@ async function bootstrap() {
 
   // Cấu hình CORS
   app.enableCors({
-    origin: ["http://localhost:3000", "http://188.166.225.136:3000"],
+    origin: ["http://localhost:3000", "http://188.166.225.136:3000", "http://188.166.225.136", "http://localhost:4000", "http://188.166.225.136:4000"],
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    allowedHeaders: ["Content-Type", "Authorization", "Accept"],
   });
 
   // Sử dụng cookie-parser

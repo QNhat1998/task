@@ -1,6 +1,8 @@
+"use client";
+
 import { useState, useEffect } from "react";
 import { Task, CreateTask } from "@/types/task";
-import Cookies from "js-cookie";
+import { useToken } from "@/hooks/useToken";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
@@ -8,10 +10,11 @@ export const useTasks = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { getToken } = useToken();
 
   // Lấy user_id từ localStorage
   const getUserId = () => {
-    const userId = localStorage.getItem("userId");
+    const userId = typeof window !== "undefined" ? localStorage.getItem("userId") : null;
     if (!userId) {
       throw new Error("User not logged in");
     }
@@ -23,7 +26,7 @@ export const useTasks = () => {
       setIsLoading(true);
       setError(null);
       const userId = getUserId();
-      const token = Cookies.get("token");
+      const token = getToken();
 
       if (!token) {
         throw new Error("No authentication token found");
@@ -57,7 +60,7 @@ export const useTasks = () => {
     try {
       setError(null);
       const userId = getUserId();
-      const token = Cookies.get("token");
+      const token = getToken();
 
       if (!token) {
         throw new Error("No authentication token found");
@@ -92,7 +95,7 @@ export const useTasks = () => {
     try {
       setError(null);
       const userId = getUserId();
-      const token = Cookies.get("token");
+      const token = getToken();
 
       if (!token) {
         throw new Error("No authentication token found");
@@ -127,7 +130,7 @@ export const useTasks = () => {
     try {
       setError(null);
       const userId = getUserId();
-      const token = Cookies.get("token");
+      const token = getToken();
 
       if (!token) {
         throw new Error("No authentication token found");
@@ -154,6 +157,10 @@ export const useTasks = () => {
       setError(err instanceof Error ? err.message : "An error occurred");
     }
   };
+
+  useEffect(() => {
+    fetchTasks();
+  }, []);
 
   return {
     tasks,

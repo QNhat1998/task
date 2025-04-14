@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Cookies from "js-cookie";
 import { User } from "@/types/task";
+import { useToken } from "@/hooks/useToken";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
 
@@ -22,6 +22,7 @@ export const useAuth = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+  const { getToken } = useToken();
 
   const login = async (data: LoginFormData) => {
     try {
@@ -34,9 +35,7 @@ export const useAuth = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(data),
-        credentials: "include",
       });
-
       if (!response.ok) {
         if (response.status === 401) {
           throw new Error("Email hoặc mật khẩu không đúng");
@@ -45,18 +44,10 @@ export const useAuth = () => {
       }
 
       const { accessToken, user } = await response.json();
-
-      // Lưu token vào Cookies với thời hạn 7 ngày
-      Cookies.set("token", accessToken, {
-        expires: 7,
-        secure: false,
-        sameSite: "lax",
-      });
-
-      // Lưu user data vào localStorage
+      // Lưu token và user data vào localStorage
+      localStorage.setItem("token", accessToken);
       localStorage.setItem("user", JSON.stringify(user));
       localStorage.setItem("userId", user.id.toString());
-
       router.push("/tasks");
     } catch (error) {
       console.error("Login error:", error);
@@ -78,7 +69,6 @@ export const useAuth = () => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(data),
-        credentials: "include",
       });
 
       if (!response.ok) {
@@ -100,13 +90,8 @@ export const useAuth = () => {
 
   const logout = () => {
     try {
-      // Xóa token từ Cookies
-      Cookies.remove("token", {
-        secure: process.env.NODE_ENV === "production",
-        sameSite: "lax",
-      });
-
-      // Xóa user data từ localStorage
+      // Xóa token và user data từ localStorage
+      localStorage.removeItem("token");
       localStorage.removeItem("user");
       localStorage.removeItem("userId");
 
@@ -124,8 +109,8 @@ export const useAuth = () => {
     return userStr ? JSON.parse(userStr) : null;
   };
 
-  // Lấy token từ Cookies
-  const token = typeof window !== "undefined" ? Cookies.get("token") : null;
+  // Lấy token từ localStorage
+  const token = getToken();
 
   // Lấy userId từ localStorage
   const userId = typeof window !== "undefined" ? localStorage.getItem("userId") : null;
